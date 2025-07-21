@@ -1,0 +1,41 @@
+# Workflow do GitHub Actions
+name: CI da aplicação para Build e Teste
+
+# Define o trigger
+on:
+  push:
+    branches: [ "main" ]  
+
+# Define os jobs 
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # Define os steps do job
+    steps:
+      - name: Checagem do código
+        uses: actions/checkout@v4
+
+      - name: Fazer o Build da Imagem
+        run: docker build -t rodrigoss384/app-python
+
+    # Teste simples
+      - name: Rodar teste simples
+        run: |
+          echo "Iniciando container pra teste..."
+          docker run -d --name container-teste rodrigoss384/app-python
+          sleep 5
+          echo "verificando logs do container..."
+          docker logs test-container
+          echo "Teste concluido."
+
+    # Login no Docker Hub
+      - name: Logar no Hub do Docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    # Publicação da imagem no Docker Hub
+      - name: Push pro Docker Hub
+        run: docker push rodrigoss384/app-python

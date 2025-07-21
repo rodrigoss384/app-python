@@ -1,0 +1,11 @@
+# ConfigMap do Aplicativo.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-app
+data:
+  APP_MODE: "development"
+
+
+
+# By: Rodrigo Souza

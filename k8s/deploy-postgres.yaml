@@ -1,0 +1,61 @@
+# PVC para ter persistência dos dados
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-postgres
+spec:
+  accessModes:
+    - ReadWriteOnce 
+  resources:
+    requests:
+      storage: 256Mi 
+---
+# Deploy para rodar o container do Postgres
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres 
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13-alpine
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: secret-postgres
+          volumeMounts:
+            - name: storage-postgres
+              mountPath: /var/lib/postgresql/data 
+      volumes:
+        - name: storage-postgres
+          persistentVolumeClaim:
+            claimName: pvc-postgres
+---
+# Service que vai expor o postgres dentro do k8s
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  selector:
+    app: postgres 
+  ports:
+    - name: postgres-tcp
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
+
+
+
+ # By: Rodrigo Souza        
