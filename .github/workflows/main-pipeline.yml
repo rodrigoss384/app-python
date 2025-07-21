@@ -17,16 +17,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fazer o Build da Imagem
-        run: docker build -t rodrigoss384/app-python
+        run: docker build -t rodrigoss384/app-python:v1 .
 
     # Teste simples
       - name: Rodar teste simples
         run: |
           echo "Iniciando container pra teste..."
-          docker run -d --name container-teste rodrigoss384/app-python
+          docker run -d --name container-teste rodrigoss384/app-python:v1
           sleep 5
           echo "verificando logs do container..."
-          docker logs test-container
+          docker logs container-teste
           echo "Teste concluido."
 
     # Login no Docker Hub
@@ -38,4 +38,4 @@ jobs:
     
     # Publicação da imagem no Docker Hub
       - name: Push pro Docker Hub
-        run: docker push rodrigoss384/app-python
+        run: docker push rodrigoss384/app-python:v1
